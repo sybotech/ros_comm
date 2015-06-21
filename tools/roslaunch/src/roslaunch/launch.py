@@ -306,6 +306,7 @@ class ROSLaunchRunner(object):
         config = self.config
         param_server = config.master.get()
         p = None
+
         try:
             # multi-call style xmlrpc
             param_server_multi = config.master.get_multi()
@@ -326,7 +327,21 @@ class ROSLaunchRunner(object):
             for p in config.params.values():
                 # suppressing this as it causes too much spam
                 #printlog("setting parameter [%s]"%p.key)
-                param_server_multi.setParam(_ID, p.key, p.value)
+                # Check if we should override existing value
+                if p.override:
+                    param_server_multi.setParam(_ID, p.key, p.value)
+                else:
+                    # Check if parameter is available
+                    hasParam = param_server.hasParam(_ID, p.key)
+
+                    if hasParam:
+                        printlog("Parameter [%s], was already specified on server"%p.key)
+                    else:
+                        printlog("Parameter [%s], was not specified on server"%p.key)
+
+                    if not hasParam:
+                        param_server.setParam(_ID, p.key, p.value)
+            # Execute sending parameters
             r  = param_server_multi()
             for code, msg, _ in r:
                 if code != 1:

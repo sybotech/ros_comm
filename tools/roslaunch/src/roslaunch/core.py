@@ -388,9 +388,10 @@ class Param(object):
     the ROS system Corresponds to the 'param' tag in the launch
     specification.
     """
-    def __init__(self, key, value):
+    def __init__(self, key, value, override=True):
         self.key = rosgraph.names.canonicalize_name(key)
         self.value = value
+        self.override = override
     def __eq__(self, p):
         if not isinstance(p, Param):
             return False

@@ -240,7 +240,7 @@ class XmlLoader(loader.Loader):
         except ValueError as e:
             raise loader.LoadException("error loading <rosparam> tag: \n\t"+str(e)+"\nXML is %s"%tag.toxml())
 
-    PARAM_ATTRS = ('name', 'value', 'type', 'value', 'textfile', 'binfile', 'command')
+    PARAM_ATTRS = ('name', 'value', 'type', 'value', 'textfile', 'binfile', 'command', 'isdefault')
     @ifunless
     def _param_tag(self, tag, context, ros_config, force_local=False, verbose=True):
         """
@@ -262,13 +262,26 @@ class XmlLoader(loader.Loader):
             # the context. otherwise it is placed in the ros config.
             name = self.resolve_args(tag.attributes['name'].value.strip(), context)
             value = self.param_value(verbose, name, ptype, *vals)
+            # Check if 'isdefaut' is set for this parameter
+            # We will not set this parameter if it is already specified before (exists)
+            default_mode = tag.getAttribute('isdefault')
+            override = True
+            if default_mode:
+                override = False
+
+            print("Default mode is "+str(default_mode))
+
+            if override:
+                print("Parameter [%s=%s] will be overriden" % (name, value))
+            else:
+                print("Parameter [%s=%s] will not be overriden" % (name, value))
 
             if is_private(name) or force_local:
-                p = Param(name, value)
+                p = Param(name, value, override)
                 context.add_param(p)
             else:
-                p = Param(ns_join(context.ns, name), value)
-                ros_config.add_param(Param(ns_join(context.ns, name), value), filename=context.filename, verbose=verbose)
+                p = Param(ns_join(context.ns, name), value, override)
+                ros_config.add_param(Param(ns_join(context.ns, name), value, override), filename=context.filename, verbose=verbose)
             return p
 
         except KeyError as e:
