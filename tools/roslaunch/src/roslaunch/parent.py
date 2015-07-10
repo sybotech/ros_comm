@@ -52,7 +52,11 @@ from roslaunch.core import printlog_bold, printerrlog, RLException
 import roslaunch.launch
 import roslaunch.pmon
 import roslaunch.server
-import roslaunch.xmlloader 
+import roslaunch.xmlloader
+
+# For upstart signal emitting
+import os
+import signal
 
 #TODO: probably move process listener infrastructure into here
 
@@ -71,7 +75,7 @@ class ROSLaunchParent(object):
     """
 
     def __init__(self, run_id, roslaunch_files, is_core=False, port=None, local_only=False, process_listeners=None,
-            verbose=False, force_screen=False, is_rostest=False, roslaunch_strs=None):
+            verbose=False, force_screen=False, is_rostest=False, roslaunch_strs=None, emit_stop=False, no_override=False):
         """
         @param run_id: UUID of roslaunch session
         @type  run_id: str
@@ -116,12 +120,13 @@ class ROSLaunchParent(object):
         
         # flag to prevent multiple shutdown attempts
         self._shutting_down = False
+        self.emit_stop = emit_stop
         
         self.config = self.runner = self.server = self.pm = self.remote_runner = None
 
     def _load_config(self):
         self.config = roslaunch.config.load_config_default(self.roslaunch_files, self.port,
-                roslaunch_strs=self.roslaunch_strs, verbose=self.verbose)
+                roslaunch_strs=self.roslaunch_strs, verbose=self.verbose, no_override=self.no_override)
 
         # #2370 (I really want to move this logic outside of parent)
         if self.force_screen:
@@ -278,7 +283,7 @@ class ROSLaunchParent(object):
         if self.process_listeners:
             for l in self.process_listeners:
                 self.runner.pm.add_process_listener(l)
-        
+
     def spin_once(self):
         """
         Run the parent roslaunch event loop once
@@ -290,6 +295,16 @@ class ROSLaunchParent(object):
         """
         Run the parent roslaunch until exit
         """
+        # Ubuntu upstart waits for SIGSTOP signal to determine whether daemon is initialized
+        # Depending services will start after that
+        if self.emit_stop:
+            #self.logger.info("... roslaunch emitting SIGSTOP and waiting for resume")
+            print("... roslaunch emitting SIGSTOP and waiting for resume")
+            os.kill(os.getpid(), signal.SIGSTOP)
+            print("... successfully resumed")
+        else:
+            print("no emit_stop specified")
+
         if not self.runner:
             raise RLException("parent not started yet")
         try:

@@ -269,7 +269,7 @@ class XmlLoader(loader.Loader):
             if default_mode:
                 override = False
 
-            print("Default mode is "+str(default_mode))
+            #print("Default mode is "+str(default_mode))
 
             if override:
                 print("Parameter [%s=%s] will be overriden" % (name, value))

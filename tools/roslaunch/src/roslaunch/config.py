@@ -150,6 +150,8 @@ class ROSLaunchConfig(object):
 
         self.logger = logging.getLogger('roslaunch')
 
+        self.no_override = False
+
     def add_roslaunch_file(self, f):
         """
         Add metadata about file used to create config
@@ -299,6 +301,9 @@ class ROSLaunchConfig(object):
         """
         key = p.key
 
+        if self.no_override:
+            p.override = False
+
         # check for direct overrides
         if key in self.params and self.params[key] != p:
             if filename:
@@ -407,7 +412,12 @@ class ROSLaunchConfig(object):
             # assign to local machine
             return self.machines['']            
 
-def load_config_default(roslaunch_files, port, roslaunch_strs=None, loader=None, verbose=False, assign_machines=True):
+def load_config_default(roslaunch_files, port,
+                        roslaunch_strs=None,
+                        loader=None,
+                        verbose=False,
+                        assign_machines=True,
+                        no_override=False):
     """
     Base routine for creating a ROSLaunchConfig from a set of 
     roslaunch_files and or launch XML strings and initializing it. This
@@ -443,6 +453,8 @@ def load_config_default(roslaunch_files, port, roslaunch_strs=None, loader=None,
     # last-declaration wins rules.  roscore is just a
     # roslaunch file with special load semantics
     load_roscore(loader, config, verbose=verbose)
+
+    config.no_override = no_override
 
     # load the roslaunch_files into the config
     for f in roslaunch_files:
