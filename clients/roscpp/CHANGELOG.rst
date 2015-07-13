@@ -2,6 +2,20 @@
 Changelog for package roscpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.13 (2015-04-28)
+--------------------
+
+1.11.12 (2015-04-27)
+--------------------
+
+1.11.11 (2015-04-16)
+--------------------
+* fix memory leak in transport constructor (`#570 <https://github.com/ros/ros_comm/pull/570>`_)
+* fix computation of stddev in statistics (`#556 <https://github.com/ros/ros_comm/pull/556>`_)
+* fix empty connection header topic (`#543 <https://github.com/ros/ros_comm/issues/543>`_)
+* alternative API to get parameter values (`#592 <https://github.com/ros/ros_comm/pull/592>`_)
+* add getCached() for float parameters (`#584 <https://github.com/ros/ros_comm/pull/584>`_)
+
 1.11.10 (2014-12-22)
 --------------------
 * fix various defects reported by coverity
@@ -125,7 +139,7 @@ Changelog for package roscpp
 * allow sending data exceeding 2GB in chunks (`#4049 <https://code.ros.org/trac/ros/ticket/4049>`_)
 * update getParam() doc (`#1460 <https://code.ros.org/trac/ros/ticket/1460>`_)
 * add param::get(float) (`#3754 <https://code.ros.org/trac/ros/ticket/3754>`_)
-* update inactive assert when publishing message with md5sum *, update related tests (`#3714 <https://code.ros.org/trac/ros/ticket/3714>`_)
+* update inactive assert when publishing message with md5sum "*", update related tests (`#3714 <https://code.ros.org/trac/ros/ticket/3714>`_)
 * fix ros master retry timeout (`#4024 <https://code.ros.org/trac/ros/ticket/4024>`_)
 * fix inactive assert when publishing message with wrong type (`#3714 <https://code.ros.org/trac/ros/ticket/3714>`_)
 

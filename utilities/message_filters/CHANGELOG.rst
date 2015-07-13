@@ -2,6 +2,16 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.13 (2015-04-28)
+--------------------
+
+1.11.12 (2015-04-27)
+--------------------
+
+1.11.11 (2015-04-16)
+--------------------
+* implement message filter cache in Python (`#599 <https://github.com/ros/ros_comm/pull/599>`_)
+
 1.11.10 (2014-12-22)
 --------------------
 
@@ -74,7 +84,7 @@ Changelog for package message_filters
 
 1.9.45 (2013-06-06)
 -------------------
-* fix template syntax for signal_.template addCallback() to work with Intel compiler
+* fix template syntax for signal\_.template addCallback() to work with Intel compiler
 
 1.9.44 (2013-03-21)
 -------------------
