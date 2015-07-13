@@ -45,6 +45,7 @@ import logging
 
 import roslaunch
 import rospkg
+from rospkg.environment import ROS_TEST_RESULTS_DIR
 import rosgraph.roslogging
 
 from rostest.rostestutil import createXMLRunner, printRostestSummary, \
@@ -94,6 +95,9 @@ def rostestmain():
     parser.add_option("--results-filename", metavar="RESULTS_FILENAME",
                       dest="results_filename", default=None,
                       help="results_filename")
+    parser.add_option("--results-base-dir", metavar="RESULTS_BASE_DIR",
+                      help="The base directory of the test results. The test result file is " +
+                           "created in a subfolder name PKG_DIR.")
     (options, args) = parser.parse_args()
     try:
         args = roslaunch.rlutil.resolve_launch_arguments(args)
@@ -132,9 +136,13 @@ def rostestmain():
     else:
         outname = rostest_name_from_path(pkg_dir, test_file)
 
+    env = None
+    if options.results_base_dir:
+        env = {ROS_TEST_RESULTS_DIR: options.results_base_dir}
+
     # #1140
     if not os.path.isfile(test_file):
-        results_file = xmlResultsFile(pkg, outname, True)
+        results_file = xmlResultsFile(pkg, outname, True, env=env)
         write_bad_filename_failure(test_file, results_file, outname)
         parser.error("test file is invalid. Generated failure case result file in %s"%results_file)
         
@@ -147,7 +155,7 @@ def rostestmain():
             result = unittest.TextTestRunner(verbosity=2).run(suite)
         else:
             is_rostest = True
-            results_file = xmlResultsFile(pkg, outname, is_rostest)        
+            results_file = xmlResultsFile(pkg, outname, is_rostest, env=env)
             xml_runner = createXMLRunner(pkg, outname, \
                                              results_file=results_file, \
                                              is_rostest=is_rostest)

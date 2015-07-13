@@ -2,6 +2,16 @@
 Changelog for package roswtf
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.13 (2015-04-28)
+--------------------
+
+1.11.12 (2015-04-27)
+--------------------
+
+1.11.11 (2015-04-16)
+--------------------
+* support IPv6 addresses containing percentage symbols (`#585 <https://github.com/ros/ros_comm/issues/585>`_)
+
 1.11.10 (2014-12-22)
 --------------------
 
