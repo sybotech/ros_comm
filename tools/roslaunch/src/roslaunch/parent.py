@@ -123,6 +123,7 @@ class ROSLaunchParent(object):
         self.emit_stop = emit_stop
         
         self.config = self.runner = self.server = self.pm = self.remote_runner = None
+        self.no_override = no_override
 
     def _load_config(self):
         self.config = roslaunch.config.load_config_default(self.roslaunch_files, self.port,
