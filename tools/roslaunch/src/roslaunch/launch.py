@@ -332,8 +332,7 @@ class ROSLaunchRunner(object):
                     param_server_multi.setParam(_ID, p.key, p.value)
                 else:
                     # Check if parameter is available
-                    hasParam = param_server.hasParam(_ID, p.key)
-
+                    hasParam = param_server.hasParam(_ID, p.key)[2]
                     if hasParam:
                         printlog("Parameter [%s], was already specified on server"%p.key)
                     else:
