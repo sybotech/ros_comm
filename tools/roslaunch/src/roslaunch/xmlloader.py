@@ -598,7 +598,7 @@ class XmlLoader(loader.Loader):
         # child context.
         if pass_all_args:
             if 'arg' in context.resolve_dict:
-                for name, value in context.resolve_dict['arg'].iteritems():
+                for name, value in context.resolve_dict['arg'].items():
                     child_ns.add_arg(name, value=value)
         # Also set the flag that tells the child context to ignore (rather than
         # error on) attempts to set the same arg twice.
