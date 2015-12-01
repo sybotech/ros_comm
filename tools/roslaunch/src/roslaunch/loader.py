@@ -215,9 +215,12 @@ class LoaderContext(object):
         """
         Add 'arg' to existing context. Args are only valid for their immediate context.
         """
-        if name in self.arg_names and not self.pass_all_args:
-            raise LoadException("arg '%s' has already been declared"%name)
-        self.arg_names.append(name)
+        if name in self.arg_names:
+            # Ignore the duplication if pass_all_args was set
+            if not self.pass_all_args:
+                raise LoadException("arg '%s' has already been declared"%name)
+        else:
+            self.arg_names.append(name)
 
         resolve_dict = self.resolve_dict if self.include_resolve_dict is None else self.include_resolve_dict
 
