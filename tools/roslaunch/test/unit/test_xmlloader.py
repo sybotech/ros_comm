@@ -938,4 +938,80 @@ class TestXmlLoader(unittest.TestCase):
         self.assertEquals(param_d['/include3/include_test/p3_test'], 'set')
         self.assertEquals(param_d['/include3/include_test/p4_test'], 'new3')
         
+    # Test the new attribute <include pass_all_args={"true"|"false"}>
+    def test_arg_all(self):
+        loader = roslaunch.xmlloader.XmlLoader()
+        filename = os.path.join(self.xml_dir, 'test-arg-all.xml')
+
+        # Test suite A: load without an optional arg set externally
+        mock = RosLaunchMock()
+        loader.load(filename, mock, argv=["required:=test_arg"])
+
+        param_d = {}
+        for p in mock.params:
+            param_d[p.key] = p.value
+
+        # Sanity check: Parent namespace
+        self.assertEquals(param_d['/p1_test'], 'test_arg')
+        self.assertEquals(param_d['/p2_test'], 'not_set')
+        self.assertEquals(param_d['/p3_test'], 'parent')
+
+        # Test case 1: include without pass_all_args
+        self.assertEquals(param_d['/notall/include_test/p1_test'], 'test_arg')
+        self.assertEquals(param_d['/notall/include_test/p2_test'], 'not_set')
+        self.assertEquals(param_d['/notall/include_test/p3_test'], 'set')
+
+        # Test case 2: include without pass_all_args attribute, and pass optional arg
+        # internally
+        self.assertEquals(param_d['/notall_optional/include_test/p1_test'], 'test_arg')
+        self.assertEquals(param_d['/notall_optional/include_test/p2_test'], 'not_set')
+        self.assertEquals(param_d['/notall_optional/include_test/p3_test'], 'set')
+
+        # Test case 3: include with pass_all_args attribute, instead of passing individual
+        # args
+        self.assertEquals(param_d['/all/include_test/p1_test'], 'test_arg')
+        self.assertEquals(param_d['/all/include_test/p2_test'], 'not_set')
+        self.assertEquals(param_d['/all/include_test/p3_test'], 'set')
+
+        # Test case 4: include with pass_all_args attribute, and override one
+        # arg inside the include tag
+        self.assertEquals(param_d['/all_override/include_test/p1_test'], 'override')
+        self.assertEquals(param_d['/all_override/include_test/p2_test'], 'not_set')
+        self.assertEquals(param_d['/all_override/include_test/p3_test'], 'set')
+
+        # Test suite B: load with an optional arg set externally
+        mock = RosLaunchMock()
+        loader.load(filename, mock, argv=["required:=test_arg", "optional:=test_arg2"])
+
+        param_d = {}
+        for p in mock.params:
+            param_d[p.key] = p.value
+
+        # Sanity check: Parent namespace
+        self.assertEquals(param_d['/p1_test'], 'test_arg')
+        self.assertEquals(param_d['/p2_test'], 'test_arg2')
+        self.assertEquals(param_d['/p3_test'], 'parent')
+
+        # Test case 1: include without pass_all_args attribute
+        self.assertEquals(param_d['/notall/include_test/p1_test'], 'test_arg')
+        self.assertEquals(param_d['/notall/include_test/p2_test'], 'not_set')
+        self.assertEquals(param_d['/notall/include_test/p3_test'], 'set')
+
+        # Test case 2: include without pass_all_args attribute, and pass optional arg
+        # internally
+        self.assertEquals(param_d['/notall_optional/include_test/p1_test'], 'test_arg')
+        self.assertEquals(param_d['/notall_optional/include_test/p2_test'], 'test_arg2')
+        self.assertEquals(param_d['/notall_optional/include_test/p3_test'], 'set')
+
+        # Test case 3: include with pass_all_args attribute, instead of passing individual
+        # args
+        self.assertEquals(param_d['/all/include_test/p1_test'], 'test_arg')
+        self.assertEquals(param_d['/all/include_test/p2_test'], 'test_arg2')
+        self.assertEquals(param_d['/all/include_test/p3_test'], 'set')
+
+        # Test case 4: include with pass_all_args attribute, and override one
+        # arg inside the include tag
+        self.assertEquals(param_d['/all_override/include_test/p1_test'], 'override')
+        self.assertEquals(param_d['/all_override/include_test/p2_test'], 'test_arg2')
+        self.assertEquals(param_d['/all_override/include_test/p3_test'], 'set')
 
