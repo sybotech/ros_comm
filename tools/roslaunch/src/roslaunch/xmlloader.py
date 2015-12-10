@@ -600,9 +600,9 @@ class XmlLoader(loader.Loader):
             if 'arg' in context.resolve_dict:
                 for name, value in context.resolve_dict['arg'].items():
                     child_ns.add_arg(name, value=value)
-        # Also set the flag that tells the child context to ignore (rather than
-        # error on) attempts to set the same arg twice.
-        child_ns.pass_all_args = True
+            # Also set the flag that tells the child context to ignore (rather than
+            # error on) attempts to set the same arg twice.
+            child_ns.pass_all_args = True
 
         for t in [c for c in tag.childNodes if c.nodeType == DomNode.ELEMENT_NODE]:
             tag_name = t.tagName.lower()

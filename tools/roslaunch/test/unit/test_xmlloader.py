@@ -1015,3 +1015,39 @@ class TestXmlLoader(unittest.TestCase):
         self.assertEquals(param_d['/all_override/include_test/p2_test'], 'test_arg2')
         self.assertEquals(param_d['/all_override/include_test/p3_test'], 'set')
 
+    def test_arg_all_includes(self):
+        loader = roslaunch.xmlloader.XmlLoader()
+        # Test 1:
+        # Can't explicitly set an arg when including a file that sets the same
+        # arg as constant.
+
+        mock = RosLaunchMock()
+        filename = os.path.join(self.xml_dir, 'test-arg-invalid-include.xml')
+        try:
+            loader.load(filename, mock)            
+            self.fail('should have thrown an exception')
+        except roslaunch.xmlloader.XmlParseException:
+            pass
+
+        # Test 2:
+        # Can have arg set in parent launch file, then include a file that sets
+        # it constant, with pass_all_args="true"
+        mock = RosLaunchMock()
+        filename = os.path.join(self.xml_dir, 'test-arg-valid-include.xml')
+        # Just make sure there's no exception
+        loader.load(filename, mock)            
+
+        # This test checks for exception behavior that would be nice to have,
+        # but would require intrusive changes to how roslaunch passes arguments
+        # to included contexts. It currently fails. I'm leaving it here as a
+        # reference for potential future work.
+        ## Test 3:
+        ## Can't do explicit override of arg during inclusion of file that sets
+        ## it constant, even when pass_all_args="true"
+        #mock = RosLaunchMock()
+        #filename = os.path.join(self.xml_dir, 'test-arg-invalid-include2.xml')
+        #try:
+        #    loader.load(filename, mock)            
+        #    self.fail('should have thrown an exception')
+        #except roslaunch.xmlloader.XmlParseException:
+        #    pass
