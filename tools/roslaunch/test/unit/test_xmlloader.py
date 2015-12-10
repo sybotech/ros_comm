@@ -1020,7 +1020,6 @@ class TestXmlLoader(unittest.TestCase):
         # Test 1:
         # Can't explicitly set an arg when including a file that sets the same
         # arg as constant.
-
         mock = RosLaunchMock()
         filename = os.path.join(self.xml_dir, 'test-arg-invalid-include.xml')
         try:
