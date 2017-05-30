@@ -65,7 +65,9 @@ try:
     from rosmaster import DEFAULT_MASTER_PORT
 except:
     DEFAULT_MASTER_PORT = 11311
-    
+
+from rosmaster.master_api import NUM_WORKERS
+
 NAME = 'roslaunch'
 
 def configure_logging(uuid):
@@ -172,12 +174,16 @@ def _get_optparse():
     parser.add_option("--disable-title", default=False, action="store_true",
                       dest="disable_title",
                       help="Disable setting of terminal title")
-    parser.add_option("--upstart", default=False, action="store_true",
-                      dest="emit_stop",
-                      help="Enable emition of SIGSTOP for upstart")
     parser.add_option("--nooverride", default=False, action="store_true",
                       dest="no_override",
                       help="Prohibit roslaunch from overriding parameters which are already specified")
+    parser.add_option("-w", "--numworkers",
+                      dest="num_workers", default=NUM_WORKERS, type=int,
+                      help="override number of worker threads. Only valid for core services.", metavar="NUM_WORKERS")
+    parser.add_option("-t", "--timeout",
+                      dest="timeout",
+                      help="override the socket connection timeout (in seconds). Only valid for core services.", metavar="TIMEOUT")
+
     return parser
     
 def _validate_args(parser, options, args):
@@ -299,7 +305,8 @@ def main(argv=sys.argv):
                     options.port = options.port or DEFAULT_MASTER_PORT
                 p = roslaunch_parent.ROSLaunchParent(uuid, args, roslaunch_strs=roslaunch_strs,
                         is_core=options.core, port=options.port, local_only=options.local_only,
-                        verbose=options.verbose, force_screen=options.force_screen, emit_stop=options.emit_stop, no_override=options.no_override)
+                        verbose=options.verbose, force_screen=options.force_screen, no_override=options.no_override,
+                        num_workers=options.num_workers, timeout=options.timeout)
                 p.start()
                 p.spin()
             finally:

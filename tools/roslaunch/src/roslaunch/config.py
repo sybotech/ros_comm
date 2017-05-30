@@ -433,6 +433,8 @@ def load_config_default(roslaunch_files, port,
     @type  verbose: bool
     @param assign_machines: (optional) assign nodes to machines (default: True)
     @type  assign_machines: bool
+    @param no_override: (optional) do not set parameters from roslaunch file if they are already exist on rosparam.
+    @type  no_override: bool
     @return: initialized rosconfig instance
     @rytpe: L{ROSLaunchConfig} initialized rosconfig instance
     @raises: RLException

@@ -422,7 +422,7 @@ class XmlLoader(loader.Loader):
                 elif tag_name == 'env':
                     self._env_tag(t, env_context, ros_config)
                 else:
-                    ros_config.add_config_error("WARN: unrecognized '%s' tag in <node> tag. Node xml is %s"%(t.tagName, tag.toxml()))
+                    ros_config.add_config_error("WARN: unrecognized '%s' child tag in the parent tag element: %s"%(t.tagName, tag.toxml()))
 
             # #1036 evaluate all ~params in context
             # TODO: can we get rid of force_local (above), remove this for loop, and just rely on param_tag logic instead?
@@ -593,13 +593,29 @@ class XmlLoader(loader.Loader):
             else:
                 ros_config.add_config_error("Deprecation Warning: "+deprecated)
 
-    INCLUDE_ATTRS = ('file', NS, CLEAR_PARAMS)
+    INCLUDE_ATTRS = ('file', NS, CLEAR_PARAMS, 'pass_all_args')
     @ifunless
     def _include_tag(self, tag, context, ros_config, default_machine, is_core, verbose):
         self._check_attrs(tag, context, ros_config, XmlLoader.INCLUDE_ATTRS)
         inc_filename = self.resolve_args(tag.attributes['file'].value, context)
 
+        if tag.hasAttribute('pass_all_args'):
+            pass_all_args = self.resolve_args(tag.attributes['pass_all_args'].value, context)
+            pass_all_args = _bool_attr(pass_all_args, False, 'pass_all_args')
+        else:
+            pass_all_args = False
+
         child_ns = self._ns_clear_params_attr(tag.tagName, tag, context, ros_config, include_filename=inc_filename)
+
+        # If we're asked to pass all args, then we need to add them into the
+        # child context.
+        if pass_all_args:
+            if 'arg' in context.resolve_dict:
+                for name, value in context.resolve_dict['arg'].items():
+                    child_ns.add_arg(name, value=value)
+            # Also set the flag that tells the child context to ignore (rather than
+            # error on) attempts to set the same arg twice.
+            child_ns.pass_all_args = True
 
         for t in [c for c in tag.childNodes if c.nodeType == DomNode.ELEMENT_NODE]:
             tag_name = t.tagName.lower()
