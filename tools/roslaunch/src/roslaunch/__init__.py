@@ -183,6 +183,10 @@ def _get_optparse():
     parser.add_option("-t", "--timeout",
                       dest="timeout",
                       help="override the socket connection timeout (in seconds). Only valid for core services.", metavar="TIMEOUT")
+    parser.add_option("--notify",
+                      dest="notify", default=False, action="store_true",
+                      help="send notification to systemd when services has started")
+
 
     return parser
     
@@ -222,6 +226,8 @@ def main(argv=sys.argv):
     logger = None
     try:
         from . import rlutil
+        
+        snotifier = None
         parser = _get_optparse()
         
         (options, args) = parser.parse_args(argv[1:])
@@ -271,7 +277,16 @@ def main(argv=sys.argv):
         logger = logging.getLogger('roslaunch')
         logger.info("roslaunch starting with args %s"%str(argv))
         logger.info("roslaunch env is %s"%os.environ)
-            
+
+        if options.notify:
+            # Importing systemd notifier
+            try:
+                from sdnotify import SystemdNotifier
+                snotifier = SystemdNotifier()
+            except Exception as e:
+                logger.error('Failed to initialize systemd notifier')
+                traceback.print_exc()
+                
         if options.child_name:
             logger.info('starting in child mode')
 
@@ -280,6 +295,9 @@ def main(argv=sys.argv):
             # commands and configuration from the server.
             from . import child as roslaunch_child
             c = roslaunch_child.ROSLaunchChild(uuid, options.child_name, options.server_uri)
+            if snotifier is not None:
+                logger.info('notifying systemd')
+                snotifier.notify("READY=1")
             c.run()
         else:
             logger.info('starting in server mode')
@@ -308,6 +326,9 @@ def main(argv=sys.argv):
                         verbose=options.verbose, force_screen=options.force_screen, no_override=options.no_override,
                         num_workers=options.num_workers, timeout=options.timeout)
                 p.start()
+                if snotifier is not None:
+                    logger.info('notifying systemd')
+                    snotifier.notify("READY=1")
                 p.spin()
             finally:
                 # remove the pid file

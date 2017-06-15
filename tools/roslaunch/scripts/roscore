@@ -56,6 +56,9 @@ def _get_optparse():
     parser.add_option("-t", "--timeout",
                       dest="timeout",
                       help="override the socket connection timeout (in seconds).", metavar="TIMEOUT")
+    parser.add_option("--notify",
+                      dest="notify", default=False, action="store_true",
+                      help="send notification to systemd when services has started")
     return parser
 
 
