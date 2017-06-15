@@ -456,6 +456,11 @@ def load_config_default(roslaunch_files, port,
     # roslaunch file with special load semantics
     load_roscore(loader, config, verbose=verbose)
 
+    env = os.environ
+    if 'ROSLAUNCH_NO_OVERRIDE' in env and env['ROSLAUNCH_NO_OVERRIDE']:
+        no_override = True
+        logger.info('Enabled NO_OVERRIDE by environment')        
+
     config.no_override = no_override
 
     # load the roslaunch_files into the config

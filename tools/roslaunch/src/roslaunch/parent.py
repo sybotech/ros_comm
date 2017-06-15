@@ -127,7 +127,6 @@ class ROSLaunchParent(object):
         
         # flag to prevent multiple shutdown attempts
         self._shutting_down = False
-        self.emit_stop = emit_stop
         
         self.config = self.runner = self.server = self.pm = self.remote_runner = None
         self.no_override = no_override
@@ -303,15 +302,6 @@ class ROSLaunchParent(object):
         """
         Run the parent roslaunch until exit
         """
-        # Ubuntu upstart waits for SIGSTOP signal to determine whether daemon is initialized
-        # Depending services will start after that
-        if self.emit_stop:
-            #self.logger.info("... roslaunch emitting SIGSTOP and waiting for resume")
-            print("... roslaunch emitting SIGSTOP and waiting for resume")
-            os.kill(os.getpid(), signal.SIGSTOP)
-            print("... successfully resumed")
-        else:
-            print("no emit_stop specified")
 
         if not self.runner:
             raise RLException("parent not started yet")

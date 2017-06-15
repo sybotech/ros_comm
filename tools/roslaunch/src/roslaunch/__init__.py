@@ -174,7 +174,7 @@ def _get_optparse():
     parser.add_option("--disable-title", default=False, action="store_true",
                       dest="disable_title",
                       help="Disable setting of terminal title")
-    parser.add_option("--nooverride", default=False, action="store_true",
+    parser.add_option("--no-override", default=False, action="store_true",
                       dest="no_override",
                       help="Prohibit roslaunch from overriding parameters which are already specified")
     parser.add_option("-w", "--numworkers",
